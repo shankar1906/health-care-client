@@ -11,6 +11,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
+
   return (
     <nav className="bg-white shadow-md py-2">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

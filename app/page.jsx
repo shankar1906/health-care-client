@@ -1,11 +1,16 @@
+"use client"
+
 import Link from "next/link"
+import Navbar from "@/components/Navbar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Map from "@/components/Map"
 
 export default function Home() {
+
   return (
     (<div className="min-h-screen bg-gradient-to-r from-purple-500 to-orange-500">
+      <Navbar/>
       {/* Banner */}
       <section className="py-20 text-center text-white h-[100vh] flex flex-col justify-center items-center" style={{
       backgroundImage: "url('https://www.econlib.org/wp-content/uploads/2018/04/health-care-.jpg')",

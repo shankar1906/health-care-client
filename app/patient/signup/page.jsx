@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Navbar from "@/components/Navbar"
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,8 +46,10 @@ export default function PatientSignupPage() {
     };
 
     return (
-        <div
-            className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-green-500"
+        <>
+            <Navbar/>
+            <div
+                className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-green-500"
             style={{
                 backgroundImage: "url('https://cdn.dribbble.com/userupload/5887764/file/original-25749087a1feca2a54419a10cd6d9ed5.gif')",
                 backgroundSize: "cover",
@@ -139,8 +142,9 @@ export default function PatientSignupPage() {
                             <Button variant="primary" type="submit">Sign Up</Button>
                         </CardFooter>
                     </form>
-                </CardContent>
-            </Card>
-        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </>
     );
 }

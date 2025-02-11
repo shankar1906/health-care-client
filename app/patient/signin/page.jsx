@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import Navbar from "@/components/Navbar"
 
 export default function PatientLoginPage() {
   const [username, setUsername] = useState("Patient123")
@@ -19,7 +20,7 @@ export default function PatientLoginPage() {
     if (username === "Patient123" && password === "Patient123") {
       toast.success("Login successful")
       setTimeout(() => {
-        router.push("/patient-dashboard?role=patient")
+        router.push("/dashboard?role=patient")
       }, 1000)
     }
     else {
@@ -28,6 +29,8 @@ export default function PatientLoginPage() {
   }
 
   return (
+    <>
+    <Navbar/>
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 to-orange-500"
       style={{
         backgroundImage: "url('https://cdn.dribbble.com/userupload/5887764/file/original-25749087a1feca2a54419a10cd6d9ed5.gif')",
@@ -70,8 +73,9 @@ export default function PatientLoginPage() {
           <Button variant="outline" onClick={() => router.push("/")}>Cancel</Button>
           <Button variant="primary" onClick={handleLogin}>Login</Button>
         </CardFooter>
-      </Card>
-    </div>
+        </Card>
+      </div>
+    </>
   )
 }
 

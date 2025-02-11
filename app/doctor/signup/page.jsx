@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -48,6 +49,8 @@ export default function DoctorSignupPage() {
   };
 
   return (
+    <>
+    <Navbar/>
     <div
       className="flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 to-orange-500"
       style={{
@@ -151,5 +154,7 @@ export default function DoctorSignupPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }
+

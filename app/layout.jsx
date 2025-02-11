@@ -1,7 +1,6 @@
 import "./globals.css"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/ThemeProvider"
-import Navbar from "@/components/Navbar"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -17,7 +16,6 @@ export default function RootLayout({
     (<html lang="en">
       <body className={inter.className}>
         {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem> */}
-          <Navbar />
           {children}
         {/* </ThemeProvider> */}
       </body>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
+import Navbar from "@/components/Navbar"
 import { ToastContainer, toast } from "react-toastify"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 
@@ -20,7 +21,7 @@ export default function DoctorLoginPage() {
     if(username === "Doctor" && password === "Doctor"){
         toast.success("Login successful")
         setTimeout(() => {
-          router.push("/doctor-dashboard?role=doctor")
+          router.push("/doctor-dashboard")
         }, 1000)
     }
     else{
@@ -30,6 +31,7 @@ export default function DoctorLoginPage() {
 
   return (
     <>
+    <Navbar/>
     <ToastContainer />
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 to-orange-500"
      style={{
@@ -74,7 +76,7 @@ export default function DoctorLoginPage() {
           <Button variant="primary" onClick={handleLogin}>Login</Button>
         </CardFooter>
       </Card>
-    </div>
+      </div>
     </>
   )
 }
