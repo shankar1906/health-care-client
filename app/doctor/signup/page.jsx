@@ -56,24 +56,23 @@ export default function DoctorSignupPage() {
         backgroundPosition: "center",
       }}
     >
-      <Card className="w-[600px] bg-white p-6 rounded-lg shadow-lg">
+      <Card className="w-[600px] bg-white p-6 rounded-lg shadow-lg border-black">
         <CardHeader>
           <CardTitle>Doctor Signup</CardTitle>
-          <CardDescription>Register as a doctor to access the platform</CardDescription>
+          <CardDescription className="text-red-600" >Register as a doctor to access the platform</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignup} className="space-y-4">
             {/* Full Name */}
-
-            <div className="flex justify-between gap-3">
-              <div className="w-1/2">
+            <div className="flex flex-col lg:flex-row justify-between gap-3">
+              <div className="lg:w-1/2 w-full ">
                 <Label htmlFor="fullName">Full Name</Label>
                 <Input id="fullName" placeholder="Dr. John Doe" value={formData.fullName} onChange={handleChange} required />
             </div>
 
             {/* Email */}
 
-            <div className="w-1/2">
+            <div className="lg:w-1/2 w-full">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" placeholder="example@email.com" value={formData.email} onChange={handleChange} required />
             </div>
@@ -81,17 +80,17 @@ export default function DoctorSignupPage() {
 
 
             {/* Phone */}
-            <div className="flex justify-between gap-3">
-              <div className="w-1/2">
+            <div className="flex flex-col lg:flex-row justify-between gap-3">
+              <div className="lg:w-1/2 w-full">
                 <Label htmlFor="phone">Phone Number</Label>
               <Input id="phone" type="tel" placeholder="+1234567890" value={formData.phone} onChange={handleChange} required />
             </div>
 
             {/* Specialization */}
-            <div className="w-1/2">
+            <div className="lg:w-1/2 w-full">
               <Label htmlFor="specialization">Specialization</Label>
-              <Select id="specialization" value={formData.specialization} onChange={handleChange} required>
-                <SelectTrigger className="w-[180px]">
+              <Select id="specialization" value={formData.specialization} onChange={handleChange} required >
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Specialization" />
                 </SelectTrigger>
                 <SelectContent>
@@ -106,36 +105,36 @@ export default function DoctorSignupPage() {
             </div>
 
             {/* Experience */}
-            <div className="flex justify-between gap-3">
-              <div className="w-1/2">
+            <div className="flex flex-col lg:flex-row justify-between gap-3">
+              <div className="lg:w-1/2 w-full">
                 <Label htmlFor="experience">Years of Experience</Label>
               <Input id="experience" type="number" placeholder="5" value={formData.experience} onChange={handleChange} required />
             </div>
 
             {/* Hospital Name */}
-            <div className="w-1/2">
+            <div className="lg:w-1/2 w-full">
               <Label htmlFor="hospitalName">Hospital/Clinic Name</Label>
               <Input id="hospitalName" placeholder="ABC Hospital" value={formData.hospitalName} onChange={handleChange} required />
             </div>
             </div>
 
             {/* Medical License Upload */}
-            <div className="flex justify-between gap-3">
-              <div className="w-1/2">
+            <div className="flex flex-col lg:flex-row justify-between gap-3">
+              {/* <div className="w-1/2">
                 <Label htmlFor="licenseFile">Medical License</Label>
               <Input id="licenseFile" type="file" onChange={handleFileChange} required />
-            </div>
+            </div> */}
 
             {/* Password */}
-            <div className="w-1/2">
+            <div className="lg:w-1/2 w-full">
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" placeholder="********" value={formData.password} onChange={handleChange} required />
             </div>
             </div>
 
             {/* Confirm Password */}
-            <div className="flex justify-between gap-3">
-              <div className="w-1/2">
+            <div className="flex flex-col lg:flex-row justify-between gap-3">
+              <div className="lg:w-1/2 w-full">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input id="confirmPassword" type="password" placeholder="********" value={formData.confirmPassword} onChange={handleChange} required />
               </div>

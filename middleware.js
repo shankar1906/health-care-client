@@ -30,6 +30,6 @@ export function middleware(request) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/dashboard/:path*"],
+  matcher: ["/", "/dashboard/:path*", "/doctor/signin", "/patient/signin"],
 }
 

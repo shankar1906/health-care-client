@@ -8,32 +8,32 @@ import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 
 export default function PatientLoginPage() {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
+  const [username, setUsername] = useState("Patient123")
+  const [password, setPassword] = useState("Patient123")
   const router = useRouter()
 
   const handleLogin = (e) => {
     e.preventDefault()
     // Here you would typically validate the credentials against a backend
     // For this example, we'll use some dummy logic
-    if (username === "doctor" && password === "doctor") {
-      router.push("/dashboard?role=doctor")
-    } else if (username === "patient" && password === "patient") {
-      router.push("/dashboard?role=patient")
-    } else if (username === "admin" && password === "admin") {
-      router.push("/dashboard?role=admin")
-    } else {
-      alert("Invalid credentials")
+    if (username === "Patient123" && password === "Patient123") {
+      toast.success("Login successful")
+      setTimeout(() => {
+        router.push("/patient-dashboard?role=patient")
+      }, 1000)
+    }
+    else {
+      toast.error("Invalid credentials")
     }
   }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 to-orange-500"
-    style={{
+      style={{
         backgroundImage: "url('https://cdn.dribbble.com/userupload/5887764/file/original-25749087a1feca2a54419a10cd6d9ed5.gif')",
         backgroundSize: "cover",
-      backgroundPosition: "center",
-     }}
+        backgroundPosition: "center",
+      }}
     >
       <Card className="w-[350px]">
         <CardHeader>

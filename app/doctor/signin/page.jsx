@@ -5,29 +5,32 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
+import { ToastContainer, toast } from "react-toastify"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 
 export default function DoctorLoginPage() {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
+  const [username, setUsername] = useState("Doctor")
+  const [password, setPassword] = useState("Doctor")
   const router = useRouter()
 
   const handleLogin = (e) => {
     e.preventDefault()
     // Here you would typically validate the credentials against a backend
     // For this example, we'll use some dummy logic
-    if (username === "doctor" && password === "doctor") {
-      router.push("/dashboard?role=doctor")
-    } else if (username === "patient" && password === "patient") {
-      router.push("/dashboard?role=patient")
-    } else if (username === "admin" && password === "admin") {
-      router.push("/dashboard?role=admin")
-    } else {
-      alert("Invalid credentials")
+    if(username === "Doctor" && password === "Doctor"){
+        toast.success("Login successful")
+        setTimeout(() => {
+          router.push("/doctor-dashboard?role=doctor")
+        }, 1000)
+    }
+    else{
+      toast.error("Invalid credentials")
     }
   }
 
   return (
+    <>
+    <ToastContainer />
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 to-orange-500"
      style={{
       backgroundImage: "url('https://aihms.in/blog/wp-content/uploads/2020/04/healthcare1.jpg')",
@@ -72,6 +75,7 @@ export default function DoctorLoginPage() {
         </CardFooter>
       </Card>
     </div>
+    </>
   )
 }
 

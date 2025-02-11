@@ -16,10 +16,10 @@ export default function Home() {
         <p className="text-xl mb-8 text-black">Integrated Patient Record Management System</p>
         <div className="space-x-4">
           <Button asChild>
-            <Link href="/doctor-login">Doctor Login</Link>
+            <Link href="/doctor/signin">Doctor Login</Link>
           </Button>
           <Button asChild variant="secondary">
-            <Link href="/patient-login">Patient Login</Link>
+            <Link href="/patient/signin">Patient Login</Link>
           </Button>
         </div>
       </section>
