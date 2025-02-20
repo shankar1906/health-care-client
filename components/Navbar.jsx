@@ -44,10 +44,6 @@ const Navbar = () => {
                         Patient
                       </MenubarRadioItem>
                     </MenubarRadioGroup>
-                    {/* <MenubarSeparator />
-                    <MenubarItem inset>Edit...</MenubarItem>
-                    <MenubarSeparator />
-                    <MenubarItem inset>Add Profile...</MenubarItem> */}
                   </MenubarContent>
                 </MenubarMenu>
               </Menubar>
