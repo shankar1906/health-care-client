@@ -9,7 +9,7 @@ const columns = [
     {
         field: "sno",
         headerName: "S.No",
-        width: 90,
+        width: 60,
         headerAlign: "center",
         align: "center",
         filterable: false,
@@ -23,47 +23,39 @@ const columns = [
         filterable: false,
     },
     {
-        field: "fullName",
-        headerName: "Full Name",
-        width: 110,
+        field: "patient",
+        headerName: "Patient",
+        width: 125,
         editable: false,
         headerAlign: "center",
         align: "center",
     },
     {
-        field: "email",
-        headerName: "Email",
+        field: "doctor",
+        headerName: "Doctor",
         sortable: false,
-        width: 110,
+        width: 125,
         headerAlign: "center",
         align: "center",
     },
     {
-        field: "phoneNumber",
-        headerName: "Phone Number",
-        width: 150,
+        field: "status",
+        headerName: "Status",
+        width: 140,
         headerAlign: "center",
         align: "center",
     },
     {
-        field: "specialization",
-        headerName: "Specialization",
-        width: 150,
-        headerAlign: "center",
-        align: "center",
-        editable: false,
-    },
-    {
-        field: "yearsOfExperience",
-        headerName: "Experience",
-        width: 130,
+        field: "date",
+        headerName: "Date",
+        width: 140,
         headerAlign: "center",
         align: "center",
         editable: false,
     },
     {
-        field: "hospitalClinicName",
-        headerName: "Hospital/Clinic",
+        field: "time",
+        headerName: "Time",
         sortable: false,
         width: 160,
         headerAlign: "center",
@@ -71,33 +63,44 @@ const columns = [
     },
     {
         field: "createdAt",
-        headerName: "Registered At",
+        headerName: "Appointment At",
+        width: 160,
+        headerAlign: "center",
+        align: "center",
+    },
+    {
+        field: "updatedAt",
+        headerName: "Updated At",
         width: 160,
         headerAlign: "center",
         align: "center",
     },
 ];
 
-export function DoctorTable() {
-    const [doctors, setDoctors] = useState([]);
+export function AppointmentTable() {
+    const [appointments, setAppointments] = useState([]);
 
     useEffect(() => {
         const fetchDoctors = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/doctors");
-                const doctorsData = response.data.data.map((doctor, index) => ({
+                const response = await axios.get("http://localhost:5000/appointments");
+                const appointmentsData = response.data.data.map((appointment, index) => ({
                     sno: index + 1,
-                    id: doctor._id, // Ensure you have a unique ID for each doctor
-                    fullName: doctor.fullName,
-                    email: doctor.email,
-                    phoneNumber: doctor.phoneNumber,
-                    specialization: doctor.specialization,
-                    yearsOfExperience: doctor.yearsOfExperience,
-                    hospitalClinicName: doctor.hospitalClinicName,
-                    createdAt: new Date(doctor.createdAt).toLocaleDateString(), // Format date as needed
+                    id: appointment._id, // Ensure you have a unique ID for each doctor
+                    patient: appointment.patient.fullName,
+                    doctor: appointment.doctor.fullName,
+                    status: appointment.status,
+                    notes: appointment.notes,
+                    date: new Date(appointment.date).toLocaleDateString({
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                    }),
+                    time: appointment.time,
+                    createdAt: new Date(appointment.createdAt).toLocaleDateString(), // Format date as needed
+                    updatedAt: new Date(appointment.updatedAt).toLocaleDateString(), // Format date as needed
                 }));
-                setDoctors(doctorsData);
-                console.log("doctorsData", doctorsData.length)
+                setAppointments(appointmentsData);
             } catch (error) {
                 console.log(error);
             }
@@ -107,20 +110,20 @@ export function DoctorTable() {
 
     // Function to export data to Excel
     const exportToExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(doctors);
+        const worksheet = XLSX.utils.json_to_sheet(appointments);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Doctors");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Appointments");
 
         // Generate Excel file and trigger download
-        XLSX.writeFile(workbook, "Doctors_Data.xlsx");
+        XLSX.writeFile(workbook, "Appointments_Data.xlsx");
     };
 
     return (
         <>
-            <Box sx={{ width: "100%", padding: 2 }} className="bg-white rounded-lg shadow-md">
+                <Box sx={{ width: "100%", padding: 2 }} className="bg-white rounded-lg shadow-md">
 
                 <div className="flex justify-between mb-2">
-                    <h1 className="text-2xl font-bold">Doctors List</h1>
+                    <h1 className="text-2xl font-bold">Appointments List</h1>
                     <Button
                         variant="contained"
                         color="primary"
@@ -132,7 +135,7 @@ export function DoctorTable() {
                     </Button>
                 </div>
                 <DataGrid
-                    rows={doctors}
+                    rows={appointments}
                     columns={columns}
                     initialState={{
                         pagination: {

@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar"
 import { useRouter } from "next/navigation"
 import UnAuth from "@/components/UnAuth"
 import { Button } from "@/components/ui/button"
-import { User, Phone, Plus, Mail,Calendar, Bell, X, Edit, DeleteIcon, Check } from "lucide-react"
+import { User, Phone, Plus, Mail, Calendar, Bell, X, Edit, DeleteIcon, Check } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { toast, ToastContainer } from "react-toastify"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -21,12 +21,12 @@ export default function DoctorDashboard() {
   const [showPrescriptions, setShowPrescriptions] = useState(false)
   const [notifications, setNotifications] = useState([])
   const [prescription, setPrescription] = useState({
-    patient:"",
-    doctor:"",
-    medication:"",
-    dosage:"",
-    frequency:"",
-    notes:"",
+    patient: "",
+    doctor: "",
+    medication: "",
+    dosage: "",
+    frequency: "",
+    notes: "",
   })
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [date, setDate] = useState("")
@@ -101,7 +101,7 @@ export default function DoctorDashboard() {
   }, [])
 
 
-  const handleAddPrescription = async (doctorId,patientId) => {
+  const handleAddPrescription = async (doctorId, patientId) => {
     if (!doctorId || !patientId) {
       return
     }
@@ -211,7 +211,9 @@ export default function DoctorDashboard() {
     try {
       const notification = JSON.parse(event.data);
       setNotifications((prevNotifications) => [...prevNotifications, notification]);
-      toast.success(`New notification: ${notification.title}`);
+      if (notification.read === false) {
+        toast.info(`New notification: ${notification.title}`);
+      }
     } catch (error) {
       console.error('Error parsing WebSocket message:', error);
       toast.error('Failed to process notification');
@@ -221,14 +223,15 @@ export default function DoctorDashboard() {
   socket.onclose = () => {
     console.log('Disconnected from WebSocket server');
   };
+
   const handleMarkAsRead = async (notificationId) => {
     if (!notificationId) {
       return
     }
-    try {
+    try { 
       const response = await axios.put(`http://localhost:5000/notifications/${notificationId}`)
       console.log("response --> ", response.data.data)
-      router.refresh()
+      window.location.reload()
     } catch (error) {
       console.log("error --> ", error)
     }
@@ -317,27 +320,33 @@ export default function DoctorDashboard() {
                   <h3 className="font-bold mr-2">
                     Notifications Center</h3>
                 </div>
-                <div className="flex items-center mt-4">
+                <div className="flex items-center mt-4 w-full" >
                   {notifications.length > 0 ? (
-                    <div className='flex flex-col gap-2'>
+                    <div className="w-full">
                       {notifications.map((notification, index) => (
-                        <div key={index} className={`p-2 rounded-md`}>
-                          <div>
-                            <div className='flex justify-between items-center'>
-                              <h1 className="font-bold mr-2">{notification.title}</h1>
-                              <p>{new Date(notification.createdAt).toLocaleString({ timeZone: 'Asia/Kolkata' }, { hour: '2-digit', minute: '2-digit', hour12: true })}</p>
-                            </div>
-                            <p>{notification.message}</p>
+                        <div key={index} className="flex flex-col space-y-2 rounded-lg border p-4">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-semibold">{notification.title}</h3>
+                            <time className="text-sm text-muted-foreground">
+                              {new Date(notification.createdAt).toLocaleString()}
+                            </time>
                           </div>
-                          <div className='flex justify-end'>
-                            {!notification.read && <Button variant="outline" className='w-fit mt-2' onClick={() => handleMarkAsRead(notification._id)}>View</Button>}
-                            {notification.read && <Button variant="outline" className='w-fit mt-2 pointer-events-none'>Viewed</Button>}
+                          <p className="text-sm text-muted-foreground">{notification.message}</p>
+                          <div className="flex justify-end">
+                            <Button
+                              variant={notification.read ? "outline" : "default"}
+                              size="sm"
+                              onClick={() => handleMarkAsRead(notification._id)}
+                              disabled={notification.read}
+                            >
+                              {notification.read ? "Viewed" : "Mark as Read"}
+                            </Button>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p>No notifications found</p>
+                    <p className="text-center text-muted-foreground">No notifications found</p>
                   )}
                 </div>
               </div>
@@ -351,7 +360,7 @@ export default function DoctorDashboard() {
           <CardContent>
             <Table>
               <TableHeader>
-                <TableRow className="text-center">
+                <TableRow>
                   <TableHead className="text-center">S.No</TableHead>
                   <TableHead className="text-center">Name</TableHead>
                   <TableHead className="text-center">Phone Number</TableHead>
@@ -362,13 +371,13 @@ export default function DoctorDashboard() {
               </TableHeader>
               <TableBody>
                 {appointments?.map((appointment, index) => (
-                  <TableRow key={index} className="text-center">
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>{appointment?.patient?.fullName}</TableCell>
-                    <TableCell>{appointment?.patient?.phoneNumber}</TableCell>
-                    <TableCell>{appointment?.notes}</TableCell>
-                    <TableCell>{appointment?.status}</TableCell>
-                    <TableCell>
+                  <TableRow key={index}>
+                    <TableCell className="text-center">{index + 1}</TableCell>
+                    <TableCell className="text-center">{appointment?.patient?.fullName || "-"}</TableCell>
+                    <TableCell className="text-center">{appointment?.patient?.phoneNumber || "-"}</TableCell>
+                    <TableCell className="text-center">{appointment?.notes || "-"}</TableCell>
+                    <TableCell className="text-center">{appointment?.status || "-"}</TableCell>
+                    <TableCell className="text-center">
                       {capitalize(appointment?.status) === "Pending" && (
                         <Button onClick={() => setIsModalOpen(true)}>Approve</Button>
                       )}
@@ -409,39 +418,39 @@ export default function DoctorDashboard() {
                                 <form>
                                   <div className="mb-4">
                                     <label htmlFor="medication" className="block text-lg font-semibold mb-1 text-left">Medication<span className="text-red-500">*</span></label>
-                                    <input type="text" id="medication" placeholder="Paracetamol, Crocin, etc." value={prescription?.medication} onChange={(e) => setPrescription({...prescription, medication: e.target.value})} className="border border-gray-300 rounded p-2 w-full" required />
+                                    <input type="text" id="medication" placeholder="Paracetamol, Crocin, etc." value={prescription?.medication} onChange={(e) => setPrescription({ ...prescription, medication: e.target.value })} className="border border-gray-300 rounded p-2 w-full" required />
                                   </div>
                                   <div className="mb-4">
                                     <label htmlFor="dosage" className="block text-lg font-semibold mb-1 text-left">Dosage<span className="text-red-500">*</span></label>
-                                    <input type="text" id="dosage" placeholder="10mg, 1000mg, etc." value={prescription?.dosage} onChange={(e) => setPrescription({...prescription, dosage: e.target.value})} className="border border-gray-300 rounded p-2 w-full" required />
+                                    <input type="text" id="dosage" placeholder="10mg, 1000mg, etc." value={prescription?.dosage} onChange={(e) => setPrescription({ ...prescription, dosage: e.target.value })} className="border border-gray-300 rounded p-2 w-full" required />
                                   </div>
                                   <div className="mb-4">
                                     <label htmlFor="frequency" className="block text-lg font-semibold mb-1 text-left">Frequency<span className="text-red-500">*</span></label>
-                                    <input type="text" id="frequency" placeholder="10mg, 1000mg, etc." value={prescription?.frequency} onChange={(e) => setPrescription({...prescription, frequency: e.target.value})} className="border border-gray-300 rounded p-2 w-full" required />
+                                    <input type="text" id="frequency" placeholder="10mg, 1000mg, etc." value={prescription?.frequency} onChange={(e) => setPrescription({ ...prescription, frequency: e.target.value })} className="border border-gray-300 rounded p-2 w-full" required />
                                   </div>
                                   <div className="mb-4">
                                     <label htmlFor="notes" className="block text-lg font-semibold mb-1 text-left">Notes<span className="text-red-500">*</span></label>
-                                    <input type="text" id="notes" placeholder="Notes about the medication" value={prescription?.notes} onChange={(e) => setPrescription({...prescription, notes: e.target.value})} className="border border-gray-300 rounded p-2 w-full" required />
+                                    <input type="text" id="notes" placeholder="Notes about the medication" value={prescription?.notes} onChange={(e) => setPrescription({ ...prescription, notes: e.target.value })} className="border border-gray-300 rounded p-2 w-full" required />
                                   </div>
                                 </form>
-                                <Button onClick={() => handleAddPrescription(doctor?._id,appointment?.patient?._id)}>Add Prescription</Button>
+                                <Button onClick={() => handleAddPrescription(doctor?._id, appointment?.patient?._id)}>Add Prescription</Button>
                               </div>
                             </div>
                           </div>
                         </div>
                       )}
                       <div className="flex items-center justify-center gap-2">
-                        {capitalize(appointment?.status) === "Confirmed" && 
-                        <Button onClick={() => setIsModalOpen(true)}><Edit className="h-4 w-4" />Edit</Button>}
-                        {capitalize(appointment?.status) === "Confirmed" && 
-                        <Button variant="destructive" onClick={() => handleCancel(appointment?._id)}>Cancel<DeleteIcon className="h-4 w-4" /></Button>}
-                        {capitalize(appointment?.status) === "Cancelled" &&
-                         <Button variant="destructive" className="pointer-events-none">Cancelled</Button>}
                         {capitalize(appointment?.status) === "Confirmed" &&
-                         <Button variant="destructive" className="bg-green-500"  onClick={() => handleAppointmentCompleted(appointment?._id)}><Check className="h-4 w-4" /></Button>}
-                        {capitalize(appointment?.status) === "Completed" && 
-                        <Button onClick={() => setPrescriptionModalOpen(true)}><Plus className="h-4 w-4" />Add Prescription</Button>}
-                        
+                          <Button onClick={() => setIsModalOpen(true)}><Edit className="h-4 w-4" />Edit</Button>}
+                        {capitalize(appointment?.status) === "Confirmed" &&
+                          <Button variant="destructive" onClick={() => handleCancel(appointment?._id)}>Cancel<DeleteIcon className="h-4 w-4" /></Button>}
+                        {capitalize(appointment?.status) === "Cancelled" &&
+                          <Button variant="destructive" className="pointer-events-none">Cancelled</Button>}
+                        {capitalize(appointment?.status) === "Confirmed" &&
+                          <Button variant="destructive" className="bg-green-500" onClick={() => handleAppointmentCompleted(appointment?._id)}><Check className="h-4 w-4" /></Button>}
+                        {capitalize(appointment?.status) === "Completed" &&
+                          <Button onClick={() => setPrescriptionModalOpen(true)}><Plus className="h-4 w-4" />Add Prescription</Button>}
+
                       </div>
                     </TableCell>
                   </TableRow>
@@ -460,14 +469,14 @@ export default function DoctorDashboard() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>S.No</TableHead>
-                    <TableHead>Patient Name</TableHead>
-                    <TableHead>Patient Phone</TableHead>
-                    <TableHead>Medication</TableHead>
-                    <TableHead>Dosage</TableHead>
-                    <TableHead>Frequency</TableHead>
-                    <TableHead>Notes</TableHead>
-                    <TableHead>Prescription Date</TableHead>
+                    <TableHead className='text-center'>S.No</TableHead>
+                    <TableHead className='text-center'>Patient Name</TableHead>
+                    <TableHead className='text-center'>Patient Phone</TableHead>
+                    <TableHead className='text-center'>Medication</TableHead>
+                    <TableHead className='text-center'>Dosage</TableHead>
+                    <TableHead className='text-center'>Frequency</TableHead>
+                    <TableHead className='text-center'>Notes</TableHead>
+                    <TableHead className='text-center'>Prescription Date</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

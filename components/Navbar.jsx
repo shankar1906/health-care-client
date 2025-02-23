@@ -15,6 +15,7 @@ const Navbar = ({ login, name }) => {
 
   const handleLogout = () => {
     localStorage.clear();
+    sessionStorage.clear();
     toast.success("Logged out successfully");
     setTimeout(() => {
       router.push("/");

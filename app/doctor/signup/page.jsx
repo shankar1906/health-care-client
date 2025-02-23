@@ -56,7 +56,6 @@ export default function DoctorSignupPage() {
       console.log(response);
       if (response.status === 200 || response.status === 201) {
         toast.success("Doctor signed up successfully");
-
         setTimeout(() => {
           router.push("/doctor/signin");
         }, 3000);
@@ -98,15 +97,15 @@ export default function DoctorSignupPage() {
               {/* Full Name */}
               <div className="flex flex-col lg:flex-row justify-between gap-3">
                 <div className="lg:w-1/2 w-full ">
-                  <Label htmlFor="fullName">Full Name</Label>
-                  <Input id="fullName" placeholder="Dr. John Doe" value={formData.fullName} onChange={handleChange} required />
+                  <Label htmlFor="fullName">Full Name <span className="text-red-600">*</span></Label>
+                  <Input id="fullName" placeholder="Ex : Saravana Kumar K" type="text" value={formData.fullName} onChange={handleChange} required />
                 </div>
 
                 {/* Email */}
 
                 <div className="lg:w-1/2 w-full">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="example@email.com" value={formData.email} onChange={handleChange} required />
+                  <Label htmlFor="email">Email <span className="text-red-600">*</span></Label>
+                  <Input id="email" type="email" placeholder="Ex : saravana@gmail.com" value={formData.email} onChange={handleChange} required />
                 </div>
               </div>
 
@@ -114,13 +113,13 @@ export default function DoctorSignupPage() {
               {/* Phone */}
               <div className="flex flex-col lg:flex-row justify-between gap-3">
                 <div className="lg:w-1/2 w-full">
-                  <Label htmlFor="phoneNumber">Phone Number</Label>
-                  <Input id="phoneNumber" type="tel" placeholder="+1234567890" value={formData.phoneNumber} onChange={handleChange} required />
+                  <Label htmlFor="phoneNumber">Phone Number <span className="text-red-600">*</span></Label>
+                  <Input id="phoneNumber" type="tel" placeholder="Ex :  9876543210" value={formData.phoneNumber} onChange={handleChange} required />
                 </div>
 
                 {/* Specialization */}
                 <div className="lg:w-1/2 w-full">
-                  <Label htmlFor="specialization">Specialization</Label>
+                  <Label htmlFor="specialization">Specialization <span className="text-red-600">*</span></Label>
                   <Select id="specialization" value={formData.specialization} onValueChange={(value) => setFormData({ ...formData, specialization: value })} required>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Specialization" />
@@ -139,14 +138,14 @@ export default function DoctorSignupPage() {
               {/* Experience */}
               <div className="flex flex-col lg:flex-row justify-between gap-3">
                 <div className="lg:w-1/2 w-full">
-                  <Label htmlFor="yearsOfExperience">Years of Experience</Label>
+                  <Label htmlFor="yearsOfExperience">Years of Experience <span className="text-red-600">*</span></Label>
                   <Input id="yearsOfExperience" type="number" placeholder="5" value={formData.yearsOfExperience} onChange={handleChange} required />
                 </div>
 
                 {/* Hospital Name */}
                 <div className="lg:w-1/2 w-full">
-                  <Label htmlFor="hospitalClinicName">Hospital/Clinic Name</Label>
-                  <Input id="hospitalClinicName" placeholder="ABC Hospital" value={formData.hospitalClinicName} onChange={handleChange} required />
+                  <Label htmlFor="hospitalClinicName">Hospital/Clinic Name <span className="text-red-600">*</span></Label>
+                  <Input id="hospitalClinicName" placeholder="Ex : A BC Hospital" value={formData.hospitalClinicName} onChange={handleChange} required />
                 </div>
               </div>
 
@@ -159,7 +158,7 @@ export default function DoctorSignupPage() {
 
                 {/* Password */}
                 <div className="lg:w-1/2 w-full">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">Password <span className="text-red-600">*</span></Label>
                   <Input id="password" type="password" placeholder="********" value={formData.password} onChange={handleChange} required />
                 </div>
               </div>
@@ -167,7 +166,7 @@ export default function DoctorSignupPage() {
               {/* Confirm Password */}
               <div className="flex flex-col lg:flex-row justify-between gap-3">
                 <div className="lg:w-1/2 w-full">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Label htmlFor="confirmPassword">Confirm Password <span className="text-red-600">*</span></Label>
                   <Input id="confirmPassword" type="password" placeholder="********" value={formData.confirmPassword} onChange={handleChange} required />
                 </div>
               </div>

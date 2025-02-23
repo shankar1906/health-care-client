@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect} from "react";
 import axios from "axios";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -84,6 +84,7 @@ export default function BookAppointment() {
 
     return (
         <>
+        
             <ToastContainer />
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 w-full h-full" onClick={() => router.back()}>
                 <div className="bg-white rounded-lg shadow-lg p-6 w-[80%] h-auto relative" onClick={(e) => e.stopPropagation()}>

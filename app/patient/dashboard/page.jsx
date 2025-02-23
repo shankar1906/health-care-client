@@ -9,7 +9,7 @@ import UnAuth from "@/components/UnAuth"
 import { useRouter } from "next/navigation"
 import { ToastContainer, toast } from "react-toastify"
 import axios from "axios"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Phone, Mail, User, Calendar, Mars, Venus, Transgender } from 'lucide-react';
 import Loader from "@/app/loader"
@@ -76,7 +76,9 @@ export default function PatientDashboard() {
       try {
         const notification = JSON.parse(event.data);
         setNotifications((prevNotifications) => [...prevNotifications, notification]);
-        toast.success(`New notification: ${notification.title}`);
+        if (notification.read === false) {
+          toast.info(`New notification: ${notification.title}`);
+        }
       } catch (error) {
         console.error('Error parsing WebSocket message:', error);
         toast.error('Failed to process notification');
@@ -105,7 +107,7 @@ export default function PatientDashboard() {
     try { 
       const response = await axios.put(`http://localhost:5000/notifications/${notificationId}`)
       console.log("response --> ", response.data.data)
-      router.refresh()
+      window.location.reload()
     } catch (error) {
       console.log("error --> ", error)
     }
@@ -132,31 +134,38 @@ export default function PatientDashboard() {
         <h1 className="text-3xl font-bold mb-8">Patient Dashboard</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <Card>
+        <Card>
             <CardHeader>
-              <CardTitle>Notification Center</CardTitle>
+              <CardTitle>Notifications</CardTitle>
+              <CardDescription>Recent system updates and alerts</CardDescription>
             </CardHeader>
-            <CardContent className='max-h-[300px] overflow-y-auto'>
+            <CardContent className="max-h-[400px] overflow-y-auto">
               {notifications.length > 0 ? (
-                <div className='flex flex-col gap-2'>
+                <div className="space-y-4">
                   {notifications.map((notification, index) => (
-                    <div key={index} className={`p-2 rounded-md`}>
-                      <div>
-                        <div className='flex justify-between items-center'>
-                          <h1 className="font-bold mr-2">{notification.title}</h1>
-                          <p>{new Date(notification.createdAt).toLocaleString({ timeZone: 'Asia/Kolkata' },{ hour: '2-digit', minute: '2-digit', hour12: true })}</p>
-                        </div>
-                        <p>{notification.message}</p>
+                    <div key={index} className="flex flex-col space-y-2 rounded-lg border p-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold">{notification.title}</h3>
+                        <time className="text-sm text-muted-foreground">
+                          {new Date(notification.createdAt).toLocaleString()}
+                        </time>
                       </div>
-                      <div className='flex justify-end'>
-                        {!notification.read && <Button variant="outline" className='w-fit mt-2' onClick={() => handleMarkAsRead(notification._id)}>View</Button>}
-                        {notification.read && <Button variant="outline" className='w-fit mt-2 pointer-events-none'>Viewed</Button>}
+                      <p className="text-sm text-muted-foreground">{notification.message}</p>
+                      <div className="flex justify-end">
+                        <Button 
+                          variant={notification.read ? "outline" : "default"} 
+                          size="sm"
+                          onClick={() => handleMarkAsRead(notification._id)}
+                          disabled={notification.read}
+                        >
+                          {notification.read ? "Viewed" : "Mark as Read"}
+                        </Button>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p>No notifications found</p>
+                <p className="text-center text-muted-foreground">No notifications found</p>
               )}
             </CardContent>
           </Card>
@@ -220,12 +229,12 @@ export default function PatientDashboard() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>S.No</TableHead>
-                    <TableHead>Medication</TableHead>
-                    <TableHead>Dosage</TableHead>
-                    <TableHead>Frequency</TableHead>
-                    <TableHead>Notes</TableHead>
-                    <TableHead>Prescription Date</TableHead>
+                    <TableHead className='text-center'>S.No</TableHead>
+                    <TableHead className='text-center'>Medication</TableHead>
+                    <TableHead className='text-center'>Dosage</TableHead>
+                    <TableHead className='text-center'>Frequency</TableHead>
+                    <TableHead className='text-center'>Notes</TableHead>
+                    <TableHead className='text-center'>Prescription Date</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -234,11 +243,11 @@ export default function PatientDashboard() {
                       {prescriptions?.map((prescription, index) => (
                         <TableRow key={prescription?._id} className='text-center'>
                           <TableCell>{index + 1}</TableCell>
-                          <TableCell>{prescription?.medication}</TableCell>
-                          <TableCell>{prescription?.dosage}</TableCell>
-                          <TableCell>{prescription?.frequency}</TableCell>
-                          <TableCell>{prescription?.notes}</TableCell>
-                          <TableCell>{prescription?.prescriptionDate}</TableCell>
+                          <TableCell>{prescription?.medication || "-"}</TableCell>
+                          <TableCell>{prescription?.dosage || "-"}</TableCell>
+                          <TableCell>{prescription?.frequency || "-"}</TableCell>
+                          <TableCell>{prescription?.notes || "-"}</TableCell>
+                          <TableCell>{prescription?.prescriptionDate || "-"}</TableCell>
                         </TableRow>
                       ))}
                     </>
@@ -276,7 +285,7 @@ const columns = [
   {
     field: 'doctor',
     headerName: 'Doctor',
-    width: 150,
+    width: 160,
     editable: false,
     headerAlign: "center",
     align: "center",
@@ -286,7 +295,7 @@ const columns = [
     field: 'specialty',
     headerName: 'Specialty',
     type: 'number',
-    width: 110,
+    width: 160,
     headerAlign: "center",
     align: "center",
     editable: false,
@@ -296,7 +305,7 @@ const columns = [
     field: 'status',
     headerName: 'Status',
     type: 'number',
-    width: 110,
+    width: 160,
     headerAlign: "center",
     align: "center",
     editable: false,
@@ -320,6 +329,24 @@ const columns = [
     align: "center",
     filterable: false,
   },
+  {
+    field: 'notes',
+    headerName: 'Notes',
+    sortable: false,
+    width: 160,
+    headerAlign: "center",
+    align: "center",
+    filterable: false,
+  },
+  {
+    field: 'createdAt',
+    headerName: 'Created At',
+    sortable: false,
+    width: 160,
+    headerAlign: "center",
+    align: "center",
+    filterable: false,
+  },
 ];
 
 
@@ -337,8 +364,10 @@ export function AppointmentsGrid() {
       doctor: appointment.doctor.fullName,
       status: appointment.status,
       specialty: appointment.doctor.specialization,
-      date: new Date(appointment.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) ?? "N/A",
-      time: appointment.time
+      date: new Date(appointment.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) ?? "-",
+      time: appointment.time ?? "-",
+      notes: appointment.notes ?? "-",
+      createdAt: new Date(appointment.createdAt).toLocaleString({timeZone: 'Asia/Kolkata'}, { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) ?? "-"
     }))
     console.log("appointmentsData --> ", appointmentsData)
     setAppointments(appointmentsData)
