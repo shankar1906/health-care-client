@@ -26,6 +26,13 @@ export default function DoctorSignupPage() {
 
   const router = useRouter();
 
+  useEffect(() => {
+    const role = sessionStorage.getItem("role-doctor")
+    if (role) {
+      router.replace("/doctor/dashboard")
+    }
+  }, [])
+
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
@@ -47,9 +54,12 @@ export default function DoctorSignupPage() {
     try {
       const response = await axios.post("http://localhost:5000/doctors/register", formData);
       console.log(response);
-      if (response.status === 200) {
+      if (response.status === 200 || response.status === 201) {
         toast.success("Doctor signed up successfully");
-        router.push("/doctor-dashboard");
+
+        setTimeout(() => {
+          router.push("/doctor/signin");
+        }, 3000);
       }
       else {
         toast.error(response.data.message);
@@ -116,11 +126,11 @@ export default function DoctorSignupPage() {
                       <SelectValue placeholder="Specialization" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="cardiologist">Cardiologist</SelectItem>
-                      <SelectItem value="dermatologist">Dermatologist</SelectItem>
-                      <SelectItem value="neurologist">Neurologist</SelectItem>
-                      <SelectItem value="orthopedic">Orthopedic</SelectItem>
-                      <SelectItem value="pediatrician">Pediatrician</SelectItem>
+                      <SelectItem value="Cardiologist">Cardiologist</SelectItem>
+                      <SelectItem value="Dermatologist">Dermatologist</SelectItem>
+                      <SelectItem value="Neurologist">Neurologist</SelectItem>
+                      <SelectItem value="Orthopedic">Orthopedic</SelectItem>
+                      <SelectItem value="Pediatrician">Pediatrician</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

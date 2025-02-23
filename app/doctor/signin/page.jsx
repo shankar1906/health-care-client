@@ -1,31 +1,50 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import Navbar from "@/components/Navbar"
 import { ToastContainer, toast } from "react-toastify"
+import axios , { AxiosError } from "axios"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 
 export default function DoctorLoginPage() {
-  const [username, setUsername] = useState("Doctor")
-  const [password, setPassword] = useState("Doctor")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const router = useRouter()
 
-  const handleLogin = (e) => {
+  useEffect(() => {
+    const role = sessionStorage.getItem("role-doctor")
+    if (role) {
+      router.replace("/doctor/dashboard")
+    }
+  }, [])
+
+  const handleLogin = async (e) => {
     e.preventDefault()
     // Here you would typically validate the credentials against a backend
     // For this example, we'll use some dummy logic
-    if(username === "Doctor" && password === "Doctor"){
-        toast.success("Login successful")
+    try {
+      const response = await axios.post("http://localhost:5000/doctors/login", {email, password});
+      // console.log(response);
+      if (response.status === 200 || response.status === 201) {
+        toast.success("Doctor signed up successfully");
+        localStorage.setItem("doctor", JSON.stringify(response.data.data));
+        sessionStorage.setItem("role-doctor", "doctor");
+        sessionStorage.setItem("token", response.data.token);
         setTimeout(() => {
-          router.push("/doctor-dashboard")
-        }, 1000)
-    }
-    else{
-      toast.error("Invalid credentials")
+          router.push("/doctor/dashboard");
+        }, 3000);
+      }
+      else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.log("error->",error);
+      console.log("error.AxiosError.data.message",error.message);
+      toast.error(error.response.data.message);
     }
   }
 
@@ -50,10 +69,10 @@ export default function DoctorLoginPage() {
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
                 <Input
-                  id="username"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  id="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="flex flex-col space-y-1.5">

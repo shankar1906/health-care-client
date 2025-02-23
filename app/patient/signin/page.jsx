@@ -1,31 +1,47 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
+import axios from "axios"
 import { toast , ToastContainer } from "react-toastify"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import Navbar from "@/components/Navbar"
 
 export default function PatientLoginPage() {
-  const [username, setUsername] = useState("Patient123")
-  const [password, setPassword] = useState("Patient123")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const router = useRouter()
 
-  const handleLogin = (e) => {
-    e.preventDefault()
-    // Here you would typically validate the credentials against a backend
-    // For this example, we'll use some dummy logic
-    if (username === "Patient123" && password === "Patient123") {
-      toast.success("Login successful")
-      setTimeout(() => {
-        router.push("/patient/dashboard")
-      }, 1000)
+  useEffect(() => {
+    const role = sessionStorage.getItem("role-patient")
+    if (role) {
+      router.replace("/patient/dashboard")
     }
-    else {
-      toast.error("Invalid credentials")
+  }, [])
+
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    try {
+      const response = await axios.post("http://localhost:5000/patients/login", { email, password });
+      console.log(response);
+      if (response.status === 200 || response.status === 201) {
+        toast.success("Login successful")
+        sessionStorage.setItem("token", response.data.token)
+        localStorage.setItem("patient", JSON.stringify(response.data.data))
+        sessionStorage.setItem("role-patient","patient")
+        setTimeout(() => {
+          router.push("/patient/dashboard")
+        }, 3000)
+      }
+      else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
     }
   }
 
@@ -50,10 +66,10 @@ export default function PatientLoginPage() {
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
                 <Input
-                  id="username"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  id="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="flex flex-col space-y-1.5">

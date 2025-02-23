@@ -1,46 +1,265 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Navbar from "@/components/Navbar"
+import { useRouter } from "next/navigation"
+import UnAuth from "@/components/UnAuth"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { User, Phone, Plus, Mail,Calendar, Bell, X, Edit, DeleteIcon, Check } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { toast, ToastContainer } from "react-toastify"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
-
-const data = [
-  { name: "Mon", patients: 4 },
-  { name: "Tue", patients: 3 },
-  { name: "Wed", patients: 5 },
-  { name: "Thu", patients: 2 },
-  { name: "Fri", patients: 6 },
-  { name: "Sat", patients: 3 },
-  { name: "Sun", patients: 1 },
-]
-
-const patientList = [
-  { id: 1, name: "John Doe", date: "2023-06-15", time: "10:00 AM", status: "Pending" },
-  { id: 2, name: "Jane Smith", date: "2023-06-15", time: "11:00 AM", status: "Approved" },
-  { id: 3, name: "Bob Johnson", date: "2023-06-16", time: "09:00 AM", status: "Pending" },
-]
+import axios from "axios"
+import Loader from "@/app/loader"
 
 export default function DoctorDashboard() {
-  const [patients, setPatients] = useState(patientList)
+  const [loading, setLoading] = useState(true)
+  const [appointments, setAppointments] = useState([])
+  const [prescriptions, setPrescriptions] = useState([])
+  const [prescriptionModalOpen, setPrescriptionModalOpen] = useState(false)
+  const [showPrescriptions, setShowPrescriptions] = useState(false)
+  const [notifications, setNotifications] = useState([])
+  const [prescription, setPrescription] = useState({
+    patient:"",
+    doctor:"",
+    medication:"",
+    dosage:"",
+    frequency:"",
+    notes:"",
+  })
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [date, setDate] = useState("")
+  const [time, setTime] = useState("")
+  const [auth, setAuth] = useState({
+    role: "",
+    token: ""
+  })
+  const [doctor, setDoctor] = useState();
+  const router = useRouter()
 
-  const handleApprove = (id) => {
-    setPatients(patients.map(
-      (patient) => (patient.id === id ? { ...patient, status: "Approved" } : patient)
-    ))
+  const data = [
+    { name: "Mon", appointments: appointments.filter(appointment => new Date(appointment.createdAt).getDay() === 1).length },
+    { name: "Tue", appointments: appointments.filter(appointment => new Date(appointment.createdAt).getDay() === 2).length },
+    { name: "Wed", appointments: appointments.filter(appointment => new Date(appointment.createdAt).getDay() === 3).length },
+    { name: "Thu", appointments: appointments.filter(appointment => new Date(appointment.createdAt).getDay() === 4).length },
+    { name: "Fri", appointments: appointments.filter(appointment => new Date(appointment.createdAt).getDay() === 5).length },
+    { name: "Sat", appointments: appointments.filter(appointment => new Date(appointment.createdAt).getDay() === 6).length },
+    { name: "Sun", appointments: appointments.filter(appointment => new Date(appointment.createdAt).getDay() === 0).length },
+  ]
+
+  useEffect(() => {
+    setLoading(true)
+    const doctor = JSON.parse(localStorage.getItem("doctor"))
+    const token = sessionStorage.getItem("token")
+    const role = sessionStorage.getItem("role-doctor")
+    setAuth({ role, token })
+    // console.log(auth)
+    // console.log(doctor)
+    // console.log(doctor)
+    setDoctor(doctor)
+
+    const fetchAppointments = async () => {
+      if (!doctor?._id) {
+        return
+      }
+      console.log("in fetch appointments")
+      const response = await axios.get(`http://localhost:5000/appointments/doctor/${doctor?._id}`)
+      // console.log(response.data.data)
+      setAppointments(response.data.data)
+    }
+
+    const fetchNotifications = async () => {
+      if (!doctor?._id) {
+        return
+      }
+      try {
+        const response = await axios.get(`http://localhost:5000/notifications/${doctor._id}`)
+        console.log("response --> ", response.data.data)
+        setNotifications(response.data.data)
+      } catch (error) {
+        console.log("error --> ", error)
+      }
+    }
+
+    const fetchPrescriptions = async () => {
+      if (!doctor?._id) {
+        return
+      }
+      try {
+        const response = await axios.get(`http://localhost:5000/prescriptions/doctor/${doctor._id}`)
+        console.log("response --> ", response.data.data)
+        setPrescriptions(response.data.data)
+      } catch (error) {
+        console.log("error --> ", error)
+      }
+    }
+    fetchAppointments()
+    fetchNotifications()
+    fetchPrescriptions()
+    setLoading(false)
+  }, [])
+
+
+  const handleAddPrescription = async (doctorId,patientId) => {
+    if (!doctorId || !patientId) {
+      return
+    }
+    try {
+      const response = await axios.post(`http://localhost:5000/prescriptions/`, {
+        patient: patientId,
+        doctor: doctorId,
+        medication: prescription?.medication,
+        dosage: prescription?.dosage,
+        frequency: prescription?.frequency,
+        notes: prescription?.notes
+      })
+      if (response.status !== 200 && response.status !== 201) {
+        toast.error(response.data.message)
+        return
+      }
+      toast.success("Prescription Added")
+      setPrescriptionModalOpen(false)
+      setPrescription({
+        medication: "",
+        dosage: "",
+        frequency: "",
+        notes: ""
+      })
+
+      router.refresh()
+    } catch (error) {
+      console.log("error --> ", error)
+      toast.error("Something went wrong")
+    }
+  }
+
+
+  const handleApprove = async (id, date, time) => {
+    const timeConverted = new Date(`${date}T${time}`);
+    const result = timeConverted.toLocaleString({ timeZone: 'Asia/Kolkata' }, { hour: '2-digit', minute: '2-digit', hour12: true });
+    // console.log("timeConverted", timeConverted);
+    // console.log("result", result);
+    try {
+      const response = await axios.put(`http://localhost:5000/appointments/${id}`, {
+        status: "Confirmed",
+        date: date ?? new Date(),
+        time: result ?? new Date().toLocaleString({ timeZone: 'Asia/Kolkata' }, { hour: '2-digit', minute: '2-digit', hour12: true }),
+      })
+      if (response.status !== 200 && response.status !== 201) {
+        toast.error(response.data.message)
+        return
+      }
+      toast.success("Appointment Confirmed")
+      setIsModalOpen(false)
+
+      setAppointments(appointments.map(
+        (appointment) => (appointment.id === id ? { ...appointment, status: "Confirmed" } : appointment)
+      ))
+    } catch (error) {
+      console.log(error)
+      toast.error("Something went wrong")
+    }
+  }
+
+  const handleCancel = async (id) => {
+    try {
+      const response = await axios.put(`http://localhost:5000/appointments/${id}`, {
+        status: "Cancelled",
+      })
+      if (response.status !== 200 && response.status !== 201) {
+        toast.error(response.data.message)
+        return
+      }
+      toast.success("Appointment Cancelled")
+      router.refresh()
+      setAppointments(appointments.filter(appointment => appointment.id !== id))
+    } catch (error) {
+      console.log(error)
+      toast.error("Something went wrong")
+    }
+  }
+
+  const handleAppointmentCompleted = async (id) => {
+    try {
+      const response = await axios.put(`http://localhost:5000/appointments/${id}`, {
+        status: "Completed",
+      })
+      if (response.status !== 200 && response.status !== 201) {
+        toast.error(response.data.message)
+        return
+      }
+      toast.success("Appointment Completed")
+      router.refresh()
+      setAppointments(appointments.map(
+        (appointment) => (appointment.id === id ? { ...appointment, status: "Completed" } : appointment)
+      ))
+    } catch (error) {
+      console.log(error)
+      toast.error("Something went wrong")
+    }
+  }
+
+  // Establish WebSocket connection
+  const socket = new WebSocket('ws://localhost:5000'); // Replace PORT with your actual port
+
+  socket.onopen = () => {
+    console.log('Connected to WebSocket server');
+  };
+
+  socket.onmessage = (event) => {
+    try {
+      const notification = JSON.parse(event.data);
+      setNotifications((prevNotifications) => [...prevNotifications, notification]);
+      toast.success(`New notification: ${notification.title}`);
+    } catch (error) {
+      console.error('Error parsing WebSocket message:', error);
+      toast.error('Failed to process notification');
+    }
+  };
+
+  socket.onclose = () => {
+    console.log('Disconnected from WebSocket server');
+  };
+  const handleMarkAsRead = async (notificationId) => {
+    if (!notificationId) {
+      return
+    }
+    try {
+      const response = await axios.put(`http://localhost:5000/notifications/${notificationId}`)
+      console.log("response --> ", response.data.data)
+      router.refresh()
+    } catch (error) {
+      console.log("error --> ", error)
+    }
+  }
+
+
+  const capitalize = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1)
+  }
+
+  if (loading) {
+    return <Loader />
+  }
+
+  if (auth.role !== "doctor") {
+    return <UnAuth />
+  }
+
+  if (!auth.token || auth.token === "") {
+    return <UnAuth />
   }
 
   return (
     <>
-      <Navbar />
+      <Navbar login={true} name={doctor?.fullName || "Doctor"} />
       <div className="p-8">
         <h1 className="text-3xl font-bold mb-8">Doctor Dashboard</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <Card>
             <CardHeader>
-              <CardTitle>Weekly Patient Count</CardTitle>
+              <CardTitle>Weekly Patient Appointments Count</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -50,7 +269,7 @@ export default function DoctorDashboard() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="patients" fill="#8884d8" />
+                  <Bar dataKey="appointments" fill="#2192FF" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -58,21 +277,70 @@ export default function DoctorDashboard() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Doctor Details</CardTitle>
+              <CardTitle>Doctor Information</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p>
-                <strong>Name:</strong> Dr. Jane Doe
-              </p>
-              <p>
-                <strong>Specialty:</strong> Cardiology
-              </p>
-              <p>
-                <strong>Phone:</strong> (123) 456-7890
-              </p>
-              <p>
-                <strong>Email:</strong> jane.doe@example.com
-              </p>
+            <CardContent style={{ maxHeight: '300px', overflowY: 'auto' }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center">
+                  <User className="mr-2 text-blue-600" />
+                  <span className="font-bold mr-2">Name:</span>
+                  <span>{doctor?.fullName}</span>
+                </div>
+                <div className="flex items-center">
+                  <Phone className="mr-2 text-green-600" />
+                  <span className="font-bold mr-2">Phone:</span>
+                  <span>{doctor?.phoneNumber}</span>
+                </div>
+                <div className="flex items-center">
+                  <Mail className="mr-2 text-red-600" />
+                  <span className="font-bold mr-2">Email:</span>
+                  <span>{doctor?.email}</span>
+                </div>
+                <div className="flex items-center">
+                  <Calendar className="mr-2 text-orange-600" />
+                  <span className="font-bold mr-2">Years of Experience:</span>
+                  <span>{doctor?.yearsOfExperience}</span>
+                </div>
+                <div className="flex items-center w-full mt-4">
+                  <Calendar className="mr-2 text-orange-600" />
+                  <span className="font-bold mr-2">Hospital/Clinic:</span>
+                  <span>{doctor?.hospitalClinicName || "N/A"}</span>
+                </div>
+                <div className="flex items-center w-full mt-4">
+                  <span className="font-bold mr-2">Specialization:</span>
+                  <span>{doctor?.specialization || "N/A"}</span>
+                </div>
+              </div>
+              <div className="flex flex-col justify-center w-full mt-4 overflow-y-auto border-t-2 border-gray-200 pt-4">
+                <div className="flex items-center">
+                  <Bell className="mr-2 text-black-600" />
+                  <h3 className="font-bold mr-2">
+                    Notifications Center</h3>
+                </div>
+                <div className="flex items-center mt-4">
+                  {notifications.length > 0 ? (
+                    <div className='flex flex-col gap-2'>
+                      {notifications.map((notification, index) => (
+                        <div key={index} className={`p-2 rounded-md`}>
+                          <div>
+                            <div className='flex justify-between items-center'>
+                              <h1 className="font-bold mr-2">{notification.title}</h1>
+                              <p>{new Date(notification.createdAt).toLocaleString({ timeZone: 'Asia/Kolkata' }, { hour: '2-digit', minute: '2-digit', hour12: true })}</p>
+                            </div>
+                            <p>{notification.message}</p>
+                          </div>
+                          <div className='flex justify-end'>
+                            {!notification.read && <Button variant="outline" className='w-fit mt-2' onClick={() => handleMarkAsRead(notification._id)}>View</Button>}
+                            {notification.read && <Button variant="outline" className='w-fit mt-2 pointer-events-none'>Viewed</Button>}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p>No notifications found</p>
+                  )}
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -83,29 +351,157 @@ export default function DoctorDashboard() {
           <CardContent>
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Time</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Action</TableHead>
+                <TableRow className="text-center">
+                  <TableHead className="text-center">S.No</TableHead>
+                  <TableHead className="text-center">Name</TableHead>
+                  <TableHead className="text-center">Phone Number</TableHead>
+                  <TableHead className="text-center">Note</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead className="text-center">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {patients.map((patient) => (
-                  <TableRow key={patient.id}>
-                    <TableCell>{patient.name}</TableCell>
-                    <TableCell>{patient.date}</TableCell>
-                    <TableCell>{patient.time}</TableCell>
-                    <TableCell>{patient.status}</TableCell>
+                {appointments?.map((appointment, index) => (
+                  <TableRow key={index} className="text-center">
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{appointment?.patient?.fullName}</TableCell>
+                    <TableCell>{appointment?.patient?.phoneNumber}</TableCell>
+                    <TableCell>{appointment?.notes}</TableCell>
+                    <TableCell>{appointment?.status}</TableCell>
                     <TableCell>
-                      {patient.status === "Pending" && <Button onClick={() => handleApprove(patient.id)}>Approve</Button>}
+                      {capitalize(appointment?.status) === "Pending" && (
+                        <Button onClick={() => setIsModalOpen(true)}>Approve</Button>
+                      )}
+                      {isModalOpen && (
+                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 w-full h-full" onClick={() => setIsModalOpen(false)}>
+                          <div className="bg-white rounded-lg shadow-lg p-6 w-[40%] h-auto relative" onClick={(e) => e.stopPropagation()}>
+                            <button className="absolute top-4 right-4" onClick={() => setIsModalOpen(false)}>
+                              <X className="h-6 w-6 text-gray-500" />
+                            </button>
+                            <h2 className="text-xl font-bold mb-4">Confirm Appointment</h2>
+                            <div>
+                              <div className="p-3">
+                                <form>
+                                  <div className="mb-4">
+                                    <label htmlFor="date" className="block text-lg font-semibold mb-1 text-left">Date<span className="text-red-500">*</span></label>
+                                    <input type="date" id="date" value={date} onChange={(e) => setDate(e.target.value)} className="border border-gray-300 rounded p-2 w-full" required />
+                                  </div>
+                                  <div className="mb-4">
+                                    <label htmlFor="time" className="block text-lg font-semibold mb-1 text-left">Time<span className="text-red-500">*</span></label>
+                                    <input type="time" id="time" value={time} onChange={(e) => setTime(e.target.value)} className="border border-gray-300 rounded p-2 w-full" required />
+                                  </div>
+                                </form>
+                                <Button onClick={() => handleApprove(appointment?._id, date, time)}>Confirm</Button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {prescriptionModalOpen && (
+                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 w-full h-full" onClick={() => setPrescriptionModalOpen(false)}>
+                          <div className="bg-white rounded-lg shadow-lg p-6 w-[40%] h-auto relative" onClick={(e) => e.stopPropagation()}>
+                            <button className="absolute top-4 right-4" onClick={() => setPrescriptionModalOpen(false)}>
+                              <X className="h-6 w-6 text-gray-500" />
+                            </button>
+                            <h2 className="text-xl font-bold mb-4">Add Prescription</h2>
+                            <div>
+                              <div className="p-3">
+                                <form>
+                                  <div className="mb-4">
+                                    <label htmlFor="medication" className="block text-lg font-semibold mb-1 text-left">Medication<span className="text-red-500">*</span></label>
+                                    <input type="text" id="medication" placeholder="Paracetamol, Crocin, etc." value={prescription?.medication} onChange={(e) => setPrescription({...prescription, medication: e.target.value})} className="border border-gray-300 rounded p-2 w-full" required />
+                                  </div>
+                                  <div className="mb-4">
+                                    <label htmlFor="dosage" className="block text-lg font-semibold mb-1 text-left">Dosage<span className="text-red-500">*</span></label>
+                                    <input type="text" id="dosage" placeholder="10mg, 1000mg, etc." value={prescription?.dosage} onChange={(e) => setPrescription({...prescription, dosage: e.target.value})} className="border border-gray-300 rounded p-2 w-full" required />
+                                  </div>
+                                  <div className="mb-4">
+                                    <label htmlFor="frequency" className="block text-lg font-semibold mb-1 text-left">Frequency<span className="text-red-500">*</span></label>
+                                    <input type="text" id="frequency" placeholder="10mg, 1000mg, etc." value={prescription?.frequency} onChange={(e) => setPrescription({...prescription, frequency: e.target.value})} className="border border-gray-300 rounded p-2 w-full" required />
+                                  </div>
+                                  <div className="mb-4">
+                                    <label htmlFor="notes" className="block text-lg font-semibold mb-1 text-left">Notes<span className="text-red-500">*</span></label>
+                                    <input type="text" id="notes" placeholder="Notes about the medication" value={prescription?.notes} onChange={(e) => setPrescription({...prescription, notes: e.target.value})} className="border border-gray-300 rounded p-2 w-full" required />
+                                  </div>
+                                </form>
+                                <Button onClick={() => handleAddPrescription(doctor?._id,appointment?.patient?._id)}>Add Prescription</Button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-center gap-2">
+                        {capitalize(appointment?.status) === "Confirmed" && 
+                        <Button onClick={() => setIsModalOpen(true)}><Edit className="h-4 w-4" />Edit</Button>}
+                        {capitalize(appointment?.status) === "Confirmed" && 
+                        <Button variant="destructive" onClick={() => handleCancel(appointment?._id)}>Cancel<DeleteIcon className="h-4 w-4" /></Button>}
+                        {capitalize(appointment?.status) === "Cancelled" &&
+                         <Button variant="destructive" className="pointer-events-none">Cancelled</Button>}
+                        {capitalize(appointment?.status) === "Confirmed" &&
+                         <Button variant="destructive" className="bg-green-500"  onClick={() => handleAppointmentCompleted(appointment?._id)}><Check className="h-4 w-4" /></Button>}
+                        {capitalize(appointment?.status) === "Completed" && 
+                        <Button onClick={() => setPrescriptionModalOpen(true)}><Plus className="h-4 w-4" />Add Prescription</Button>}
+                        
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Prescriptions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {showPrescriptions ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>S.No</TableHead>
+                    <TableHead>Patient Name</TableHead>
+                    <TableHead>Patient Phone</TableHead>
+                    <TableHead>Medication</TableHead>
+                    <TableHead>Dosage</TableHead>
+                    <TableHead>Frequency</TableHead>
+                    <TableHead>Notes</TableHead>
+                    <TableHead>Prescription Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {prescriptions.length > 0 ? (
+                    <>
+                      {prescriptions?.map((prescription, index) => (
+                        <TableRow key={prescription?._id} className='text-center'>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>{prescription?.patient?.fullName}</TableCell>
+                          <TableCell>{prescription?.patient?.phoneNumber}</TableCell>
+                          <TableCell>{prescription?.medication}</TableCell>
+                          <TableCell>{prescription?.dosage}</TableCell>
+                          <TableCell>{prescription?.frequency}</TableCell>
+                          <TableCell>{prescription?.notes}</TableCell>
+                          <TableCell>{new Date(prescription?.createdAt).toLocaleDateString({ timeZone: 'Asia/Kolkata' }, { year: 'numeric', month: 'long', day: 'numeric' })}</TableCell>
+                        </TableRow>
+                      ))}
+                    </>
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} className='text-center'>No prescriptions found</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            ) : (
+              <p>Click the button below to view your prescriptions.</p>
+            )}
+          </CardContent>
+          <CardFooter>
+            <Button onClick={() => setShowPrescriptions(!showPrescriptions)}>
+              {showPrescriptions ? "Hide Prescriptions" : "View Prescriptions"}
+            </Button>
+          </CardFooter>
         </Card>
       </div>
     </>

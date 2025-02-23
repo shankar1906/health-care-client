@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import Navbar from "@/components/Navbar"
+import { toast,ToastContainer } from "react-toastify"
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState("Admin123")
@@ -30,10 +31,11 @@ export default function AdminLoginPage() {
 
   return (
     <>
+    <ToastContainer/>
     <Navbar/>
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 to-orange-500"
       style={{
-        backgroundImage: "url('https://cdn.dribbble.com/userupload/5887764/file/original-25749087a1feca2a54419a10cd6d9ed5.gif')",
+        backgroundImage: "url('https://thumbs.dreamstime.com/b/ai-medical-background-concept-155234616.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
