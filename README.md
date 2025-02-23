@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Integrated Patient Record Management System (IPRMS)
 
-## Getting Started
+## Overview
 
-First, run the development server:
+The Integrated Patient Record Management System (IPRMS) is a web application designed to streamline healthcare processes and improve patient care. It provides functionalities for doctors, patients, and administrators to manage appointments, prescriptions, and patient records efficiently.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **User Authentication**: Secure login for doctors and patients.
+- **Dashboard**: Overview of key metrics for administrators, including total patients, doctors, and appointments.
+- **Appointment Management**: Patients can book, view, and manage their appointments with doctors.
+- **Prescription Management**: Doctors can issue and manage prescriptions for patients.
+- **Notifications**: Real-time notifications for users regarding appointments and system updates.
+- **Data Visualization**: Charts and graphs to visualize patient demographics and appointment trends.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Technologies Used
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Frontend**: 
+  - React.js
+  - Next.js
+  - Tailwind CSS
+  - Recharts for data visualization
+  - Lucide React for icons
 
-## Learn More
+- **Backend**: 
+  - Node.js
+  - Express.js
+  - MongoDB for database management
+  - WebSocket for real-time notifications
 
-To learn more about Next.js, take a look at the following resources:
+## Installation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/iprms.git
+   cd iprms
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-## Deploy on Vercel
+3. Set up the backend:
+   - Navigate to the backend directory and install its dependencies.
+   - Configure your database connection in the backend configuration file.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+5. Open your browser and navigate to `http://localhost:3000`.
+
+## Usage
+
+- **For Doctors**: Log in using your credentials to manage patient appointments and prescriptions.
+- **For Patients**: Sign up and log in to book appointments and view your medical history.
+- **For Administrators**: Access the admin dashboard to manage users and view system statistics.
+
+## Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/YourFeature`).
+3. Make your changes and commit them (`git commit -m 'Add some feature'`).
+4. Push to the branch (`git push origin feature/YourFeature`).
+5. Open a pull request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Thanks to all contributors and the open-source community for their support and resources.
