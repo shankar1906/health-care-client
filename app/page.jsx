@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Map from "@/components/Map"
+import Chatbot from "@/components/Chatbot"
 
 export default function Home() {
 
@@ -25,6 +26,9 @@ export default function Home() {
           </Button>
           <Button asChild variant="secondary">
             <Link href="/patient/signin">Patient Login</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/op/register">OP Registration</Link>
           </Button>
         </div>
       </section>
@@ -66,10 +70,12 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* Add Chatbot component */}
+      <Chatbot />
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-8">
         <div className="container mx-auto px-4 text-center">
-          <p>&copy; 2023 IPRMS. All rights reserved.</p>
+          <p>&copy; 2025 IPRMS. All rights reserved.</p>
         </div>
       </footer>
     </div>)

@@ -41,8 +41,6 @@ export default function AdminDashboard() {
   ])
   const [patientsCount, setPatientsCount] = useState(0)
   const [doctorsCount, setDoctorsCount] = useState(0)
-  const [appointmentsCount, setAppointmentsCount] = useState(0)
-  const [prescriptionsCount, setPrescriptionsCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [auth, setAuth] = useState({
     token: "",
@@ -59,28 +57,13 @@ export default function AdminDashboard() {
     const fetchNotifications = async () => {
       try {
         const response = await axios.get("http://localhost:5000/notifications/admin")
-        // console.log(response.data)
-        setNotifications(response.data.data)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    const fetchAllCounts = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/admin/get-all-counts")
         console.log(response.data)
-        setPatientsCount(response.data.data.patients)
-        setDoctorsCount(response.data.data.doctors)
-        setAppointmentsCount(response.data.data.appointments)
-        setPrescriptionsCount(response.data.data.prescriptions)
+        setNotifications(response.data)
       } catch (error) {
         console.log(error)
       }
     }
-
     fetchNotifications()
-    fetchAllCounts()
   }, [])
 
 
@@ -95,9 +78,7 @@ export default function AdminDashboard() {
     try {
       const notification = JSON.parse(event.data);
       setNotifications((prevNotifications) => [...prevNotifications, notification]);
-      if (notification.read === false) {
-        toast.info(`New notification: ${notification.title}`);
-      }
+      toast.success(`New notification: ${notification.title}`);
     } catch (error) {
       console.error('Error parsing WebSocket message:', error);
       toast.error('Failed to process notification');
@@ -122,7 +103,7 @@ export default function AdminDashboard() {
     try {
       const response = await axios.put(`http://localhost:5000/notifications/${notificationId}`)
       console.log("response --> ", response.data.data)
-      window.location.reload()
+      router.refresh()
     } catch (error) {
       console.log("error --> ", error)
     }
@@ -144,65 +125,65 @@ export default function AdminDashboard() {
     <>
       <ToastContainer />
       <Navbar login={true} name={"Admin"} />
-      <div className="p-8" style={{backgroundColor: "#f0f0f0"}}>
+      <div className="container mx-auto p-6">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
           <div className="flex items-center gap-4">
-            <div className="text-2xl font-bold">
-              👋 Welcome back, Admin!
-            </div>
+            <Button variant="outline" className="flex items-center gap-2">
+              <Download className="h-4 w-4" /> Export Data
+            </Button>
           </div>
         </div>
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          <Card className="bg-gradient-to-r from-[#FF6F61] to-[#D55A3C] border-b-[8px] border-b-[#ff947a] shadow-md hover:scale-105 transition-all duration-300">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Total Patients</CardTitle>
-              <Users className="h-4 w-4 text-white" />
+              <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{patientsCount}</div>
-              <p className="text-xs text-gray-200">Registered users</p>
+              <div className="text-2xl font-bold">{patientsCount}</div>
+              <p className="text-xs text-muted-foreground">Registered users</p>
             </CardContent>
           </Card>
-          <Card className="bg-gradient-to-r from-[#6BBF59] to-[#4DAA3D] border-b-[8px] border-b-[#92fa80] shadow-md hover:scale-105 transition-all duration-300">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Total Doctors</CardTitle>
-              <UserCog className="h-4 w-4 text-white" />
+              <CardTitle className="text-sm font-medium">Total Doctors</CardTitle>
+              <UserCog className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{doctorsCount}</div>
-              <p className="text-xs text-gray-200">Active practitioners</p>
+              <div className="text-2xl font-bold">{doctorsCount}</div>
+              <p className="text-xs text-muted-foreground">Active practitioners</p>
             </CardContent>
           </Card>
-          <Card className="bg-gradient-to-r from-[#F39C12] to-[#D68A10] border-b-[8px] border-b-[#ffd28a] shadow-md hover:scale-105 transition-all duration-300">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Appointments</CardTitle>
-              <Calendar className="h-4 w-4 text-white" />
+              <CardTitle className="text-sm font-medium">Appointments</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{appointmentsCount}</div>
-              <p className="text-xs text-gray-200">Scheduled today</p>
+              <div className="text-2xl font-bold">24</div>
+              <p className="text-xs text-muted-foreground">Scheduled today</p>
             </CardContent>
           </Card>
-          <Card className="bg-gradient-to-r from-[#8E44AD] to-[#732D91] border-b-[8px] border-b-[#d47cfa] shadow-md hover:scale-105 transition-all duration-300">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Prescriptions</CardTitle>
-              <Pill className="h-4 w-4 text-white" />
+              <CardTitle className="text-sm font-medium">Prescriptions</CardTitle>
+              <Pill className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{prescriptionsCount}</div>
-              <p className="text-xs text-gray-200">Issued today</p>
+              <div className="text-2xl font-bold">12</div>
+              <p className="text-xs text-muted-foreground">Issued today</p>
             </CardContent>
           </Card>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mb-8">
-          <Card className="col-span-4 bg-gradient-to-b from-[#ffffff] to-[#8dffff] shadow-md">
+          <Card className="col-span-4">
             <CardHeader>
               <CardTitle>User Distribution</CardTitle>
-              <CardDescription className="text-black">Overview of registered users by type</CardDescription>
+              <CardDescription>Overview of registered users by type</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -263,20 +244,20 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        <Tabs defaultValue="doctors" className="space-y-4 bg-white rounded-lg p-4">
-          <TabsList className="py-7 px-3">
-            <TabsTrigger value="doctors" className="py-2 px-3">Doctors</TabsTrigger>
-            <TabsTrigger value="patients" className="py-2 px-3">Patients</TabsTrigger>
-            <TabsTrigger value="appointments" className="py-2 px-3">Appointments</TabsTrigger>
-            <TabsTrigger value="prescriptions" className="py-2 px-3">Prescriptions</TabsTrigger>
+        <Tabs defaultValue="doctors" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="doctors">Doctors</TabsTrigger>
+            <TabsTrigger value="patients">Patients</TabsTrigger>
+            <TabsTrigger value="appointments">Appointments</TabsTrigger>
+            <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
           </TabsList>
           
           <TabsContent value="doctors" className="border rounded-lg p-4">
-            <DoctorTable />
+            <DoctorTable setDoctorsCount={setDoctorsCount} />
           </TabsContent>
           
           <TabsContent value="patients" className="border rounded-lg p-4">
-            <PatientTable />
+            <PatientTable setPatientsCount={setPatientsCount} />
           </TabsContent>
           
           <TabsContent value="appointments" className="border rounded-lg p-4">
